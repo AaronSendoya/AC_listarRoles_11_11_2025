@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">roles_usuario</string>
+
+    <!-- Títulos -->
+    <string name="gestion_roles">Gestión de Roles</string>
+    <string name="roles_registrados">Roles Registrados</string>
+
+    <!-- Hints de los campos -->
+    <string name="hint_nombre_rol">Nombre del rol</string>
+    <string name="hint_descripcion_rol">Descripción del rol</string>
+
+    <!-- Botones -->
+    <string name="guardar_rol">Guardar Rol</string>
+
+    <!-- Mensajes -->
+    <string name="error_nombre_vacio">El nombre del rol es obligatorio</string>
+    <string name="error_descripcion_vacia">La descripción del rol es obligatoria</string>
+    <string name="rol_guardado_exito">Rol guardado exitosamente</string>
+    <string name="lista_roles_vacia">No hay roles registrados</string>
+</resources>

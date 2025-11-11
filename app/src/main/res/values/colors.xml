@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primary">#5E81AC</color>
+    <color name="primary_dark">#4C6A92</color>
+    <color name="primary_light">#81A1C1</color>
+    <color name="accent">#88C0D0</color>
+
+    <!-- Colores de superficie y fondo -->
+    <color name="background">#ECEFF4</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="surface_variant">#E5E9F0</color>
+
+    <!-- Colores de texto -->
+    <color name="primary_text">#2E3440</color>
+    <color name="secondary_text">#4C566A</color>
+    <color name="on_primary">#FFFFFF</color>
+
+    <!-- Otros colores -->
+    <color name="divider">#D8DEE9</color>
+    <color name="icon_tint">#5E81AC</color>
+    <color name="error">#BF616A</color>
+
+    <!-- Colores predeterminados de Material -->
+    <color name="purple_200">#BBDEFB</color>
+    <color name="purple_500">#5E81AC</color>
+    <color name="purple_700">#4C6A92</color>
+    <color name="teal_200">#88C0D0</color>
+    <color name="teal_700">#5E8C99</color>
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+</resources>
