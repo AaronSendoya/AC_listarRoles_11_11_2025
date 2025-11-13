@@ -2,10 +2,8 @@ package com.example.roles_usuario;
 
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -14,18 +12,19 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements RolAdapter.OnItemClickListener, RolAdapter.OnItemLongClickListener {
 
     EditText edtNombreRol, edtDescripcionRol;
     Button btnGuardarRol;
-    ListView lvRoles;
-    ArrayAdapter<Rol> adapter;
+    RecyclerView rvRoles;
+    RolAdapter adapter;
     ArrayList<Rol> listaRoles;
     int idRolEnEdicion = -1;
-    //variable para almacenar el ID
     DBHelper db;
 
     @Override
@@ -43,57 +42,17 @@ public class MainActivity extends AppCompatActivity {
         edtNombreRol = findViewById(R.id.edtNombreRol);
         edtDescripcionRol = findViewById(R.id.edtDescripcionRol);
         btnGuardarRol = findViewById(R.id.btnGuardarRol);
-        lvRoles = findViewById(R.id.lvRoles);
+        rvRoles = findViewById(R.id.lvRoles);
 
         db = new DBHelper(this);
 
+        // Configuración del RecyclerView
+        rvRoles.setLayoutManager(new LinearLayoutManager(this));
+        listaRoles = new ArrayList<>();
+        adapter = new RolAdapter(this, listaRoles, this, this);
+        rvRoles.setAdapter(adapter);
+
         cargarRoles();
-        //listener para Editar
-        lvRoles.setOnItemClickListener((parent, view, position, id) -> {
-            Rol rolSeleccionado = listaRoles.get(position);
-
-            edtNombreRol.setText(rolSeleccionado.getNombre());
-            edtDescripcionRol.setText(rolSeleccionado.getDescripcion());
-
-            idRolEnEdicion = rolSeleccionado.getId();
-            btnGuardarRol.setText("Actualizar Rol");
-            Toast.makeText(MainActivity.this, "Editando Rol ID: " + idRolEnEdicion, Toast.LENGTH_SHORT).show();
-        });
-
-        //listener para Eliminarion
-        lvRoles.setOnItemLongClickListener((parent, view, position, id) -> {
-            Rol rolSeleccionado = listaRoles.get(position);
-
-
-
-            new AlertDialog.Builder(MainActivity.this)
-                    .setTitle("Confirmar Eliminación")
-                    .setMessage("¿Estás seguro de querer eliminar el rol '" + rolSeleccionado.getNombre() + "'?")
-                    .setPositiveButton("Sí", (dialog, which) -> {
-                        // Lógica de eliminación si el usuario presiona "Sí"
-                        boolean exito = db.eliminarRol(rolSeleccionado.getId());
-
-                        if (exito) {
-                            Toast.makeText(MainActivity.this, "Rol '" + rolSeleccionado.getNombre() + "' eliminado correctamente", Toast.LENGTH_SHORT).show();
-                            cargarRoles(); // Recarga la lista
-                        } else {
-                            Toast.makeText(MainActivity.this, "Error al eliminar el rol", Toast.LENGTH_SHORT).show();
-                        }
-
-                        if (idRolEnEdicion == rolSeleccionado.getId()) {
-                            idRolEnEdicion = -1;
-                            edtNombreRol.setText("");
-                            edtDescripcionRol.setText("");
-                            btnGuardarRol.setText("Guardar Rol");
-                        }
-                    })
-                    .setNegativeButton("No", null) //cierra el diálogo si el usuario presiona "No"
-                    .show();
-
-            cargarRoles();
-            return true;
-        });
-
 
         btnGuardarRol.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -107,31 +66,29 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 if (idRolEnEdicion != -1) {
-                    // Lógica de Actualización: Preguntar antes de continuar
+
                     new AlertDialog.Builder(MainActivity.this)
                             .setTitle("Confirmar Actualización")
                             .setMessage("¿Estás seguro de querer actualizar el rol a '" + nombre + "'?")
                             .setPositiveButton("Sí", (dialog, which) -> {
-                                // Lógica de actualización si el usuario presiona "Sí"
+
                                 Rol rol = new Rol(idRolEnEdicion, nombre, descripcion);
                                 boolean exito = db.actualizarRol(rol);
 
                                 if (exito) {
                                     Toast.makeText(MainActivity.this, "Rol actualizado correctamente", Toast.LENGTH_SHORT).show();
                                 } else {
-                                    Toast.makeText(MainActivity.this, "Error al actualizar el rol", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(MainActivity.this, "Error al actualizar el rol (¿Nombre duplicado?)", Toast.LENGTH_SHORT).show();
                                 }
 
-                                idRolEnEdicion = -1; // Reinicia el ID de edición
-                                edtNombreRol.setText("");
-                                edtDescripcionRol.setText("");
-                                btnGuardarRol.setText("Guardar Rol"); // Vuelve a la inserción
+                                limpiarFormulario();
                                 cargarRoles();
                             })
-                            .setNegativeButton("No", null) // Cierra el diálogo sin hacer nada
+                            .setNegativeButton("No", null)
                             .show();
 
                 } else {
+                    // Lógica de Inserción
                     boolean exito = db.insertarRol(nombre, descripcion);
                     if (exito) {
                         Toast.makeText(MainActivity.this, "Rol insertado correctamente", Toast.LENGTH_SHORT).show();
@@ -139,28 +96,66 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(MainActivity.this, "Error al insertar el rol (¿Nombre duplicado?)", Toast.LENGTH_SHORT).show();
                     }
 
-                    edtNombreRol.setText("");
-                    edtDescripcionRol.setText("");
+                    limpiarFormulario();
                     cargarRoles();
                 }
             }
         });
     }
 
-    private void cargarRoles() {
-        listaRoles = db.obtenerRoles();
+    // metodo para Editar
+    @Override
+    public void onItemClick(Rol rolSeleccionado) {
 
-        if (listaRoles != null) {
-            adapter = new ArrayAdapter<>(this,
-                    android.R.layout.simple_list_item_1,
-                    listaRoles);
-            lvRoles.setAdapter(adapter);
+        edtNombreRol.setText(rolSeleccionado.getNombre());
+        edtDescripcionRol.setText(rolSeleccionado.getDescripcion());
+
+        idRolEnEdicion = rolSeleccionado.getId();
+        btnGuardarRol.setText("Actualizar Rol");
+        Toast.makeText(MainActivity.this, "Editando Rol ID: " + idRolEnEdicion, Toast.LENGTH_SHORT).show();
+    }
+
+    // metodo para Eliminar
+    @Override
+    public void onItemLongClick(Rol rolSeleccionado) {
+        new AlertDialog.Builder(MainActivity.this)
+                .setTitle("Confirmar Eliminación")
+                .setMessage("¿Estás seguro de querer eliminar el rol '" + rolSeleccionado.getNombre() + "'?")
+                .setPositiveButton("Sí", (dialog, which) -> {
+
+                    boolean exito = db.eliminarRol(rolSeleccionado.getId());
+
+                    if (exito) {
+                        Toast.makeText(MainActivity.this, "Rol '" + rolSeleccionado.getNombre() + "' eliminado correctamente", Toast.LENGTH_SHORT).show();
+                        cargarRoles();
+
+                        if (idRolEnEdicion == rolSeleccionado.getId()) {
+                            limpiarFormulario();
+                        }
+                    } else {
+                        Toast.makeText(MainActivity.this, "Error al eliminar el rol", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton("No", null)
+
+                .show();
+    }
+
+    private void limpiarFormulario() {
+        idRolEnEdicion = -1;
+        edtNombreRol.setText("");
+        edtDescripcionRol.setText("");
+        btnGuardarRol.setText("Guardar Rol");
+    }
+
+    private void cargarRoles() {
+        ArrayList<Rol> rolesObtenidos = db.obtenerRoles();
+
+        if (rolesObtenidos != null) {
+            adapter.setRoles(rolesObtenidos);
+            this.listaRoles = rolesObtenidos;
+
         } else {
-            listaRoles = new ArrayList<>();
-            adapter = new ArrayAdapter<>(this,
-                    android.R.layout.simple_list_item_1,
-                    listaRoles);
-            lvRoles.setAdapter(adapter);
             Toast.makeText(this, "No se pudieron cargar los roles de la base de datos.", Toast.LENGTH_LONG).show();
         }
     }

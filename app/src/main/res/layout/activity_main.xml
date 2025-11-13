@@ -14,7 +14,6 @@
         android:layout_height="match_parent"
         android:padding="16dp">
 
-        <!-- Título de la pantalla -->
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/tvTitulo"
             android:layout_width="0dp"
@@ -28,7 +27,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- Card contenedor para los campos de entrada -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardFormulario"
             android:layout_width="0dp"
@@ -47,7 +45,6 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <!-- Campo de nombre -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilNombreRol"
                     android:layout_width="match_parent"
@@ -71,7 +68,6 @@
 
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Campo de descripción -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilDescripcionRol"
                     android:layout_width="match_parent"
@@ -103,7 +99,6 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Sección de lista -->
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/tvListaTitulo"
             android:layout_width="0dp"
@@ -118,7 +113,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- Lista de roles con Card -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardLista"
             android:layout_width="0dp"
@@ -132,21 +126,17 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
-            <ListView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/lvRoles"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:divider="@color/divider"
-                android:dividerHeight="1dp"
                 android:padding="8dp"
                 android:clipToPadding="false"
-                android:scrollbars="vertical" />
-
-        </com.google.android.material.card.MaterialCardView>
+                android:scrollbars="vertical"
+                tools:listitem="@layout/item_rol" /> </com.google.android.material.card.MaterialCardView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- Botón flotante para guardar -->
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/btnGuardarRol"
         android:layout_width="wrap_content"
